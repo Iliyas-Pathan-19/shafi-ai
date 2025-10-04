@@ -1,11 +1,12 @@
 package com.jarvisai.data.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+// Temporarily disabled due to Room being disabled
+// import androidx.room.Entity
+// import androidx.room.PrimaryKey
 
-@Entity(tableName = "command_history")
+// @Entity(tableName = "command_history")
 data class CommandHistory(
-    @PrimaryKey(autoGenerate = true)
+    // @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val command: String,
     val transcript: String,

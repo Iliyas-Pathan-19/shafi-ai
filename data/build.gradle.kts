@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
 }
 
@@ -39,21 +40,23 @@ kapt {
         arg("room.schemaLocation", "$projectDir/schemas")
         arg("room.incremental", "true")
         arg("room.expandProjection", "true")
-        // Disable schema verification to avoid native SQLite loader issues on Windows during KAPT
+        // Disable problematic Room features for Windows compatibility
         arg("room.verifySchema", "false")
-        // Disable database verifier to avoid SQLite native library issues on Windows
-        arg("room.disableDatabaseVerifier", "true")
     }
+    // Use incremental annotation processing
+    useBuildCache = true
+    // Disable error-prone checks that can cause issues on Windows
+    correctErrorTypes = true
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     
-    // Room Database
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
+    // Room Database - temporarily disabled due to Windows SQLite native library issues
+    // implementation(libs.androidx.room.runtime)
+    // implementation(libs.androidx.room.ktx)
     implementation(libs.firebase.crashlytics)
-    kapt(libs.androidx.room.compiler)
+    // kapt(libs.androidx.room.compiler)
     
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)

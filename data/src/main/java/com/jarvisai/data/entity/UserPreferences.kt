@@ -1,11 +1,12 @@
 package com.jarvisai.data.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+// Temporarily disabled due to Room being disabled
+// import androidx.room.Entity
+// import androidx.room.PrimaryKey
 
-@Entity(tableName = "user_preferences")
+// @Entity(tableName = "user_preferences")
 data class UserPreferences(
-    @PrimaryKey
+    // @PrimaryKey
     val id: Long = 1, // Single row for user preferences
     val assistantName: String = "Jarvis",
     val userNickname: String? = null,
