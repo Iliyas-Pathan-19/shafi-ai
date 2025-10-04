@@ -21,8 +21,10 @@ import com.jarvisai.assistant.core.tts.JarvisTTS
 import com.jarvisai.assistant.core.tts.TTSRequest
 import com.jarvisai.assistant.core.tts.TTSVoice
 import com.jarvisai.assistant.core.emotion.EmotionAnalyzer
+import com.jarvisai.assistant.core.wakeword.WakeWordDetector
 import com.jarvisai.data.repository.CommandHistoryRepository
 import com.jarvisai.data.repository.UserPreferencesRepository
+import com.jarvisai.assistant.core.actions.DeviceActionHandler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -37,6 +39,8 @@ class VoiceAssistantService : LifecycleService() {
     @Inject lateinit var voskASR: VoskASR
     @Inject lateinit var jarvisTTS: JarvisTTS
     @Inject lateinit var emotionClassifier: EmotionAnalyzer
+    @Inject lateinit var deviceActionHandler: DeviceActionHandler
+    @Inject lateinit var wakeWordDetector: WakeWordDetector
     
     private var audioRecord: AudioRecord? = null
     private var isListening = false
@@ -86,6 +90,10 @@ class VoiceAssistantService : LifecycleService() {
     
     private suspend fun initializeVoiceComponents() {
         try {
+            // Initialize Wake Word Detector
+            val wakeWordInitialized = wakeWordDetector.initialize()
+            Log.d("VoiceService", "Wake word detector initialized: $wakeWordInitialized")
+            
             // Initialize ASR
             val asrInitialized = voskASR.initialize()
             Log.d("VoiceService", "ASR initialized: $asrInitialized")
@@ -94,8 +102,9 @@ class VoiceAssistantService : LifecycleService() {
             val ttsInitialized = jarvisTTS.initialize()
             Log.d("VoiceService", "TTS initialized: $ttsInitialized")
             
-            // Emotion classifier is already initialized via dependency injection
-            Log.d("VoiceService", "Emotion classifier available: ${emotionClassifier.isModelLoaded()}")
+            // Initialize Emotion Classifier
+            val emotionInitialized = emotionClassifier.initialize()
+            Log.d("VoiceService", "Emotion classifier initialized: $emotionInitialized")
             
         } catch (e: Exception) {
             Log.e("VoiceService", "Error initializing voice components", e)
@@ -104,7 +113,13 @@ class VoiceAssistantService : LifecycleService() {
     
     private fun updateWakeWords(assistantName: String) {
         // Update wake word patterns based on assistant name
-        // This would be used with Porcupine when integrated
+        val wakeWords = listOf(
+            "hey $assistantName",
+            "hey ${assistantName.lowercase()}",
+            assistantName,
+            "assistant"
+        )
+        wakeWordDetector.setWakeWords(wakeWords)
         Log.d("VoiceService", "Updated wake words for assistant: $assistantName")
     }
     
@@ -232,31 +247,27 @@ class VoiceAssistantService : LifecycleService() {
     private suspend fun processAudioStream() {
         val buffer = ShortArray(bufferSize)
         
+        // Start wake word detector
+        wakeWordDetector.startListening()
+        
         while (isListening && audioRecord?.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
             val bytesRead = audioRecord?.read(buffer, 0, buffer.size) ?: 0
             
             if (bytesRead > 0) {
-                // Simulate wake word detection (replace with Porcupine integration)
-                if (simulateWakeWordDetection(buffer)) {
+                // Process audio with wake word detector
+                val detectionResult = wakeWordDetector.processAudioData(buffer)
+                if (detectionResult?.detected == true) {
                     handleWakeWordDetected()
                 }
             }
             
             delay(100) // Small delay to prevent excessive CPU usage
         }
+        
+        // Stop wake word detector
+        wakeWordDetector.stopListening()
     }
     
-    private fun simulateWakeWordDetection(audioBuffer: ShortArray): Boolean {
-        // This is a placeholder for actual wake word detection
-        // In real implementation, this would use Porcupine or similar wake word engine
-        return if (isDebug) {
-            // In debug builds, make detection more likely so it's easy to verify
-            (0..50).random() == 7
-        } else {
-            // For release, keep probability very low
-            (0..1000).random() == 42
-        }
-    }
     
     private fun handleWakeWordDetected() {
         if (wakeWordDetected) return
@@ -296,17 +307,16 @@ class VoiceAssistantService : LifecycleService() {
                         
                         val asrResult = voskASR.processAudioData(audioChunk)
                         if (asrResult?.isFinal == true && asrResult.text.isNotBlank()) {
-                            // Process the recognized text
-                            val emotionResult = if (emotionClassifier.isModelLoaded()) {
-                                val features = emotionClassifier.extractAudioFeatures(audioChunk)
-                                emotionClassifier.classifyEmotion(features)
+                            // Process the recognized text with TensorFlow emotion analysis
+                            val detectedEmotion = if (emotionClassifier.isModelLoaded()) {
+                                emotionClassifier.analyzeEmotion(audioChunk)
                             } else null
                             
                             val voiceInput = VoiceInput(
                                 transcript = asrResult.text,
                                 confidence = asrResult.confidence,
-                                detectedEmotion = emotionResult?.emotion,
-                                emotionConfidence = emotionResult?.confidence
+                                detectedEmotion = detectedEmotion,
+                                emotionConfidence = 0.8f
                             )
                             
                             processVoiceCommand(voiceInput)
@@ -335,8 +345,20 @@ class VoiceAssistantService : LifecycleService() {
     private suspend fun processVoiceCommand(voiceInput: VoiceInput) {
         val command = intentParser.parseCommand(voiceInput.transcript)
         
-        // Generate appropriate response based on emotion and command
-        val responseText = generateResponse(command, voiceInput.detectedEmotion?.name)
+        // Execute the command and get result
+        val commandResult = try {
+            deviceActionHandler.executeCommand(command)
+        } catch (e: Exception) {
+            Log.e("VoiceService", "Error executing command", e)
+            com.jarvisai.assistant.core.model.CommandResult(
+                command = command,
+                success = false,
+                message = "Failed to execute command: ${e.message}"
+            )
+        }
+        
+        // Generate appropriate response based on emotion and command result
+        val responseText = generateResponse(commandResult, voiceInput.detectedEmotion?.name)
         
         // Get user preferences for TTS
         val preferences = userPreferencesRepository.getUserPreferences().first()
@@ -363,7 +385,7 @@ class VoiceAssistantService : LifecycleService() {
             command = command.toString(),
             transcript = voiceInput.transcript,
             response = responseText,
-            successful = speechSuccess,
+            successful = commandResult.success && speechSuccess,
             detectedEmotion = voiceInput.detectedEmotion?.name,
             confidence = voiceInput.confidence
         )
@@ -375,15 +397,11 @@ class VoiceAssistantService : LifecycleService() {
         updateNotification("Listening for wake word...")
     }
     
-    private fun generateResponse(command: com.jarvisai.assistant.core.model.Command, emotion: String?): String {
-        val baseResponse = when (command) {
-            is com.jarvisai.assistant.core.model.Command.Call -> "I'll call ${command.contact ?: command.phoneNumber} for you."
-            is com.jarvisai.assistant.core.model.Command.Message -> "I'll send your message to ${command.contact}."
-            is com.jarvisai.assistant.core.model.Command.PlayMedia -> "I'll play ${command.query ?: "some music"} for you."
-            is com.jarvisai.assistant.core.model.Command.Navigate -> "I'll help you navigate to ${command.destination}."
-            is com.jarvisai.assistant.core.model.Command.DeviceAction -> "I'll ${command.action.name.lowercase().replace("_", " ")} for you."
-            is com.jarvisai.assistant.core.model.Command.Research -> "I'll search for ${command.query} for you."
-            is com.jarvisai.assistant.core.model.Command.Unknown -> "I'm sorry, I didn't understand that command."
+    private fun generateResponse(commandResult: com.jarvisai.assistant.core.model.CommandResult, emotion: String?): String {
+        val baseResponse = if (commandResult.success) {
+            commandResult.message
+        } else {
+            "I'm sorry, I couldn't ${getActionDescription(commandResult.command)}. ${commandResult.message}"
         }
         
         // Modify response based on detected emotion
@@ -393,6 +411,18 @@ class VoiceAssistantService : LifecycleService() {
             "angry", "frustrated" -> "Right away. $baseResponse"
             "surprised" -> "Oh! $baseResponse"
             else -> baseResponse
+        }
+    }
+    
+    private fun getActionDescription(command: com.jarvisai.assistant.core.model.Command): String {
+        return when (command) {
+            is com.jarvisai.assistant.core.model.Command.Call -> "make that call"
+            is com.jarvisai.assistant.core.model.Command.Message -> "send that message"
+            is com.jarvisai.assistant.core.model.Command.PlayMedia -> "play that media"
+            is com.jarvisai.assistant.core.model.Command.Navigate -> "navigate there"
+            is com.jarvisai.assistant.core.model.Command.DeviceAction -> command.action.name.lowercase().replace("_", " ")
+            is com.jarvisai.assistant.core.model.Command.Research -> "search for that"
+            is com.jarvisai.assistant.core.model.Command.Unknown -> "understand that command"
         }
     }
     

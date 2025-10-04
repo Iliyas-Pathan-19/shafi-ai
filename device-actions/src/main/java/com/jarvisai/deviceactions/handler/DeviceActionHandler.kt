@@ -1,13 +1,10 @@
 package com.jarvisai.deviceactions.handler
 
 import android.content.Context
+import com.jarvisai.assistant.core.actions.DeviceActionHandler
 import com.jarvisai.assistant.core.model.Command
 import com.jarvisai.assistant.core.model.CommandResult
 import javax.inject.Inject
-
-interface DeviceActionHandler {
-    suspend fun executeCommand(command: Command): CommandResult
-}
 
 class DeviceActionHandlerImpl @Inject constructor(
     private val context: Context,

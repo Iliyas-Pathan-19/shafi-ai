@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">iliyasai</string>
+    <string name="accessibility_service_description">JarvisAI Accessibility Service provides voice-controlled device actions including lock screen control, navigation, and system interactions.</string>
 </resources>

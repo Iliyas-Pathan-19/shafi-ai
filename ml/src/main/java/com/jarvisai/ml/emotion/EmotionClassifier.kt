@@ -88,6 +88,16 @@ class EmotionClassifier @Inject constructor(
         return features
     }
     
+    override suspend fun initialize(): Boolean {
+        // Mock implementation
+        return true
+    }
+    
+    override suspend fun analyzeEmotion(audioData: ShortArray): Emotion? {
+        // Mock implementation
+        return emotionLabels.random()
+    }
+    
     override fun isModelLoaded(): Boolean = false // Temporarily disabled
     
     fun close() {

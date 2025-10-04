@@ -39,10 +39,11 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(project(":assistant-core"))
     
-    // TensorFlow Lite - temporarily disabled due to dependency issues
+    // TensorFlow Lite - temporarily disabled due to version issues
     // implementation(libs.tensorflow.lite)
     // implementation(libs.tensorflow.lite.support)
     // implementation(libs.tensorflow.lite.metadata)
+    // implementation("org.tensorflow:tensorflow-lite-gpu:2.13.0")
     
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)

@@ -52,7 +52,7 @@ object DeviceActionsModule {
         mediaHandler: MediaHandler,
         navigationHandler: NavigationHandler,
         systemActionHandler: SystemActionHandler
-    ): DeviceActionHandler {
+    ): com.jarvisai.assistant.core.actions.DeviceActionHandler {
         return DeviceActionHandlerImpl(
             context = context,
             callHandler = callHandler,

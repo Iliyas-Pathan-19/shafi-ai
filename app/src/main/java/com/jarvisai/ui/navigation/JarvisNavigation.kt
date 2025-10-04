@@ -10,11 +10,15 @@ import com.jarvisai.ui.screens.home.HomeScreen
 import com.jarvisai.ui.screens.onboarding.OnboardingScreen
 import com.jarvisai.ui.screens.settings.SettingsScreen
 import com.jarvisai.ui.screens.voice.VoiceCloneScreen
+import com.jarvisai.utils.PermissionStatus
 
 @Composable
 fun JarvisNavigation(
     navController: NavHostController,
-    startDestination: String = JarvisScreen.Home.route
+    startDestination: String = JarvisScreen.Home.route,
+    permissionStatus: PermissionStatus? = null,
+    onRequestPermissions: (() -> Unit)? = null,
+    onRequestBatteryOptimization: (() -> Unit)? = null
 ) {
     NavHost(
         navController = navController,
@@ -26,7 +30,10 @@ fun JarvisNavigation(
                     navController.navigate(JarvisScreen.Home.route) {
                         popUpTo(JarvisScreen.Onboarding.route) { inclusive = true }
                     }
-                }
+                },
+                permissionStatus = permissionStatus,
+                onRequestPermissions = onRequestPermissions,
+                onRequestBatteryOptimization = onRequestBatteryOptimization
             )
         }
         

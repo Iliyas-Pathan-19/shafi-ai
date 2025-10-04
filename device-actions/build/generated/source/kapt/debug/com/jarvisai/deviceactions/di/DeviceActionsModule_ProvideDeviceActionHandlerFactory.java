@@ -1,8 +1,8 @@
 package com.jarvisai.deviceactions.di;
 
 import android.content.Context;
+import com.jarvisai.assistant.core.actions.DeviceActionHandler;
 import com.jarvisai.deviceactions.handler.CallHandler;
-import com.jarvisai.deviceactions.handler.DeviceActionHandler;
 import com.jarvisai.deviceactions.handler.MediaHandler;
 import com.jarvisai.deviceactions.handler.MessageHandler;
 import com.jarvisai.deviceactions.handler.NavigationHandler;

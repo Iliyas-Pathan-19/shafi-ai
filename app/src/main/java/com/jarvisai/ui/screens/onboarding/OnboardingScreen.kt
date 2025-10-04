@@ -15,14 +15,30 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.jarvisai.ui.components.JarvisAvatar
+import com.jarvisai.ui.screens.permissions.PermissionScreen
+import com.jarvisai.utils.PermissionStatus
 
 @Composable
 fun OnboardingScreen(
     onOnboardingComplete: () -> Unit,
+    permissionStatus: PermissionStatus? = null,
+    onRequestPermissions: (() -> Unit)? = null,
+    onRequestBatteryOptimization: (() -> Unit)? = null,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    
+    // Check if we need to show permission screen first
+    if (permissionStatus != null && !permissionStatus.hasMinimumPermissions) {
+        PermissionScreen(
+            permissionStatus = permissionStatus,
+            onRequestPermissions = onRequestPermissions ?: { },
+            onSkip = { /* Continue with limited functionality */ }
+        )
+        return
+    }
+    
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
