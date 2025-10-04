@@ -21,7 +21,13 @@ fun JarvisNavigation(
         startDestination = startDestination
     ) {
         composable(JarvisScreen.Onboarding.route) {
-            Text("Hello Jarvis!")
+            OnboardingScreen(
+                onOnboardingComplete = {
+                    navController.navigate(JarvisScreen.Home.route) {
+                        popUpTo(JarvisScreen.Onboarding.route) { inclusive = true }
+                    }
+                }
+            )
         }
         
         composable(JarvisScreen.Home.route) {

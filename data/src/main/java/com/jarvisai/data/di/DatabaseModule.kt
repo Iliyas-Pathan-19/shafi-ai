@@ -1,9 +1,10 @@
 package com.jarvisai.data.di
 
 import android.content.Context
-// import com.jarvisai.data.dao.CommandHistoryDao
-// import com.jarvisai.data.dao.UserPreferencesDao
-import com.jarvisai.data.database.JarvisDatabase
+import com.jarvisai.data.dao.CommandHistoryDao
+import com.jarvisai.data.dao.CommandHistoryDaoImpl
+import com.jarvisai.data.dao.UserPreferencesDao
+import com.jarvisai.data.dao.UserPreferencesDaoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,18 +18,13 @@ object DatabaseModule {
     
     @Provides
     @Singleton
-    fun provideJarvisDatabase(@ApplicationContext context: Context): JarvisDatabase {
-        return JarvisDatabase.getDatabase(context)
+    fun provideCommandHistoryDao(): CommandHistoryDao {
+        return CommandHistoryDaoImpl()
     }
     
-    // Temporarily disabled due to Room being disabled
-    // @Provides
-    // fun provideCommandHistoryDao(database: JarvisDatabase): CommandHistoryDao {
-    //     return database.commandHistoryDao()
-    // }
-    
-    // @Provides
-    // fun provideUserPreferencesDao(database: JarvisDatabase): UserPreferencesDao {
-    //     return database.userPreferencesDao()
-    // }
+    @Provides
+    @Singleton
+    fun provideUserPreferencesDao(@ApplicationContext context: Context): UserPreferencesDao {
+        return UserPreferencesDaoImpl(context)
+    }
 }

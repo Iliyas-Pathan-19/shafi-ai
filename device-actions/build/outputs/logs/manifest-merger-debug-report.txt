@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 manifest
-ADDED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml:2:13-83
-INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml:2:13-83
+ADDED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml:2:13-83
+INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml:2:13-83
 	package
-		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml
+		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml
 	xmlns:android
-		ADDED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml:2:23-81
+		ADDED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml:2:23-81
 uses-sdk
-INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml reason: use-sdk injection requested
-INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml
-INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml
+INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml reason: use-sdk injection requested
+INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml
+INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml
 	android:targetSdkVersion
-		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml
+		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml
 	android:minSdkVersion
-		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest11048907016338218793.xml
+		INJECTED from A:\A2-HANI\iliyasai\device-actions\build\intermediates\tmp\ProcessLibraryManifest\debug\tempAndroidManifest3334872389539253645.xml

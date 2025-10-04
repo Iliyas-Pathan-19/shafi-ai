@@ -48,10 +48,23 @@ fun JarvisAIApp(
     repo: com.jarvisai.data.repository.UserPreferencesRepository
 ) {
     val navController = rememberNavController()
+    var startDestination by remember { mutableStateOf(JarvisScreen.Onboarding.route) }
     
-    // Simple test - just show onboarding directly without async loading
+    // Check if onboarding is complete
+    LaunchedEffect(Unit) {
+        try {
+            val preferences = repo.getUserPreferences().first()
+            if (preferences.isOnboardingComplete) {
+                startDestination = JarvisScreen.Home.route
+            }
+        } catch (e: Exception) {
+            // If there's an error, default to onboarding
+            startDestination = JarvisScreen.Onboarding.route
+        }
+    }
+    
     JarvisNavigation(
         navController = navController,
-        startDestination = JarvisScreen.Onboarding.route
+        startDestination = startDestination
     )
 }

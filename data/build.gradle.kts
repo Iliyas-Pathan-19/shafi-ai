@@ -42,6 +42,9 @@ kapt {
         arg("room.expandProjection", "true")
         // Disable problematic Room features for Windows compatibility
         arg("room.verifySchema", "false")
+        // Additional Windows compatibility settings
+        arg("room.disableDatabaseVerifier", "true")
+        arg("room.enableVerification", "false")
     }
     // Use incremental annotation processing
     useBuildCache = true
