@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Iliyasai" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- App theme referenced by AndroidManifest -->
+    <style name="Theme.JarvisAI" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
